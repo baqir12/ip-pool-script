@@ -31,16 +31,19 @@ for i in `seq 1 $total_ns`;
 do
 ssh root@$CLIENT_IP "ip netns exec ns$i pon d$i"
 done
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd ippool show"
 for i in `seq 1 $total_ns`;
 do
 pp=$(ssh root@$CLIENT_IP ip netns exec ns"$i" ifconfig| grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'|head -1)
 echo $pp
 done
+sleep 2
 for i in `seq 1 $total_ns`;
 do
 ssh root@$CLIENT_IP "ip netns exec ns$i poff d$i"
 done
+sleep 2
 
 
 echo "************************************************************************************"
@@ -98,18 +101,23 @@ echo "**************************************************************************
 echo "Test Case 2"
 
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV $POOL_ILV"
+sleep 2
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV 10.10.10.1-2"
 for i in `seq 1 $total_ns`;do
-old=$(ssh root@$CLIENT_IP "cat /etc/ppp/peers/d$i |awk '/"/,/"/ {print $2}'")
+old=$(ssh root@$CLIENT_IP cat /etc/ppp/peers/d$i |awk '/"/,/"/ {print $2}')
 ssh root@$CLIENT_IP "sed -i 's/$old/\"user-ILV\"/g' /etc/ppp/peers/$i"
+sleep 2
 done
 for i in `seq 1 $total_ns`;do
         ssh root@$CLIENT_IP "ip netns exec ns$i pon d$i"
 done
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd show sessions"
 ssh root@$CLIENT_IP "ip netns exec ns$i poff d1"
+sleep 2
 ssh root@$ACCEL_IP "accel-cmd show sessions"
 ssh root@$CLIENT_IP "ip netns exec ns$i pon d1"
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd show sessions"
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV 10.10.10.1-2"
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-I $POOL_I"
@@ -117,20 +125,24 @@ for i in `seq 1 $total_ns`;
 do
 ssh root@$CLIENT_IP "ip netns exec ns$i poff d$i"
 done
+sleep 4
 
 echo "************************************************************************************"
 
-echo "Test Case 3"
+echo -e "\n \e[0;34m Test Case 3 \e[0m \n"
 
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV $POOL_ILV"
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV 10.10.10.1-1"
 #ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV 10.10.11.1-1"
 ssh root@$CLIENT_IP "ip netns exec ns1 pon d1"
+sleep 5
 ssh root@$CLIENT_IP "ip netns exec ns2 pon d2"
+sleep 5
 echo "one user must be connected"
 ssh root@$ACCEL_IP "accel-cmd show sessions"
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV 10.10.11.1-1"
 ssh root@$CLIENT_IP "ip netns exec ns2 pon d2"
+sleep 5
 echo "now both should be connected"
 ssh root@$ACCEL_IP "accel-cmd show sessions"
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV 10.10.11.1-1"
@@ -140,6 +152,7 @@ for i in `seq 1 $total_ns`;
 do
 ssh root@$CLIENT_IP "ip netns exec ns$i poff d$i"
 done
+sleep 4
 
 echo "************************************************************************************"
 
@@ -148,11 +161,14 @@ echo "Test Case 4"
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV $POOL_ILV"
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV 10.10.10.1-1"
 ssh root@$CLIENT_IP "ip netns exec ns1 pon d1"
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd show sessions"
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV 10.10.10.1-1"
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV 10.10.11.1-1"
 ssh root@$CLIENT_IP "ip netns exec ns1 poff d1"
+sleep 3
 ssh root@$CLIENT_IP "ip netns exec ns1 pon d1"
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd show sessions"
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV 10.10.11.1-1"
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV 10.10.10.1-1"
@@ -161,6 +177,7 @@ for i in `seq 1 $total_ns`;
 do
 ssh root@$CLIENT_IP "ip netns exec ns$i poff d$i"
 done
+sleep 5
 
 echo "************************************************************************************"
 
@@ -170,22 +187,26 @@ for i in `seq 1 $total_ns`;
 do
 ssh root@$CLIENT_IP "ip netns exec ns$i pon d$i"
 done
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd show sessions"
 for i in `seq 1 $total_ns`;
 do
 ssh root@$CLIENT_IP "ip netns exec ns$i poff d$i"
 done
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV $POOL_ILV"
 for i in `seq 1 $total_ns`;
 do
 ssh root@$CLIENT_IP "ip netns exec ns$i pon d$i"
 done
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd show sessions"
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV $POOL_ILV"
 for i in `seq 1 $total_ns`;
 do
 ssh root@$CLIENT_IP "ip netns exec ns$i poff d$i"
 done
+sleep 5
 
 
 echo "************************************************************************************"
@@ -208,12 +229,16 @@ ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV $POOL_ILV"
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV 10.10.10.1-1"
 #ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV 10.10.11.1-1"
 ssh root@$CLIENT_IP "ip netns exec ns1 pon d1"
+sleep 5
 ssh root@$CLIENT_IP "ip netns exec ns2 pon d2"
+sleep 5
 echo "one user must be connected"
 ssh root@$ACCEL_IP "accel-cmd show sessions"
 ssh root@$CLIENT_IP "ip netns exec ns2 poff d2"
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV 10.10.11.1-1"
 ssh root@$CLIENT_IP "ip netns exec ns2 pon d2"
+sleep 5
 echo "now both should be connected"
 ssh root@$ACCEL_IP "accel-cmd show sessions"
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV 10.10.11.1-1"
@@ -223,6 +248,7 @@ for i in `seq 1 $total_ns`;
 do
 ssh root@$CLIENT_IP "ip netns exec ns$i poff d$i"
 done
+sleep 5
 
 echo "************************************************************************************"
 
@@ -231,15 +257,19 @@ echo "Test Case 9"
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV $POOL_ILV"
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV 10.10.10.1-1"
 ssh root@$CLIENT_IP "ip netns exec ns1 pon d1"
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd show sessions"
 ssh root@$CLIENT_IP "ip netns exec ns1 poff d1"
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd show sessions"
 ssh root@$CLIENT_IP "ip netns exec ns1 pon d1"
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd show sessions"
 for i in `seq 1 $total_ns`;
 do
 ssh root@$CLIENT_IP "ip netns exec ns$i poff d$i"
 done
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV 10.10.10.1-1"
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV $POOL_ILV"
 
@@ -255,8 +285,10 @@ echo "Test Case 11"
 
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV $POOL_ILV"
 ssh root@$CLIENT_IP "ip netns exec ns1 pon d1"
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd show sessions"
 ssh root@$CLIENT_IP "ip netns exec ns1 poff d1"
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV $POOL_ILV"
 
 echo "************************************************************************************"
@@ -266,12 +298,15 @@ echo "Test Case 12"
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV $POOL_ILV"
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV 10.10.10.1-1"
 ssh root@$CLIENT_IP "ip netns exec ns1 pon d1"
+sleep 5
 ssh root@$CLIENT_IP "ip netns exec ns2 pon d2"
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd show sessions"
 for i in `seq 1 $total_ns`;
 do
 ssh root@$CLIENT_IP "ip netns exec ns$i poff d$i"
 done
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV 10.10.10.1-1"
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV $POOL_ILV"
 
@@ -283,6 +318,7 @@ for i in `seq 1 $total_ns`;
 do
 ssh root@$CLIENT_IP "ip netns exec ns$i poff d$i"
 done
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd ippool percentage"
 
 echo "************************************************************************************"
@@ -295,11 +331,13 @@ for i in `seq 1 $total_ns`;
 do
 ssh root@$CLIENT_IP "ip netns exec ns$i pon d$i"
 done
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd ippool percentage"
 for i in `seq 1 $total_ns`;
 do
 ssh root@$CLIENT_IP "ip netns exec ns$i poff d$i"
 done
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV 10.10.10.1-1"
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV $POOL_ILV"
 
@@ -316,8 +354,10 @@ echo "Test Case 16"
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV $POOL_ILV"
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV 10.10.10.1-2"
 ssh root@$CLIENT_IP "ip netns exec ns1 pon d1"
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd ippool percentage"
 ssh root@$CLIENT_IP "ip netns exec ns2 pon d2"
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd ippool percentage"
 
 echo "************************************************************************************"
@@ -326,8 +366,10 @@ echo "Test Case 17"
 
 ssh root@$ACCEL_IP "accel-cmd ippool percentage"
 ssh root@$CLIENT_IP "ip netns exec ns1 poff d1"
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd ippool percentage"
 ssh root@$CLIENT_IP "ip netns exec ns2 poff d2"
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd ippool percentage"
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV 10.10.10.1-1"
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV $POOL_ILV"
@@ -335,6 +377,7 @@ for i in `seq 1 $total_ns`;
 do
 ssh root@$CLIENT_IP "ip netns exec ns$i poff d$i"
 done
+sleep 5
 
 echo "************************************************************************************"
 
@@ -377,6 +420,7 @@ echo "Test Case 22"
 ssh root@$ACCEL_IP "accel-cmd ippool delete pool-ILV $POOL_ILV"
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV 10.10.10.1-1"
 ssh root@$CLIENT_IP "ip netns exec ns1 pon d1"
+sleep 5
 ssh root@$ACCEL_IP "accel-cmd ippool percentage"
 ssh root@$ACCEL_IP "accel-cmd ippool add pool-ILV 10.10.11.1-1"
 ssh root@$ACCEL_IP "accel-cmd ippool percentage"
@@ -387,6 +431,7 @@ for i in `seq 1 $total_ns`;
 do
 ssh root@$CLIENT_IP "ip netns exec ns$i poff d$i"
 done
+sleep 5
 
 echo "************************************************************************************"
 
